@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"groupie-tracker-gui/internal/models"
 	"net/http"
 )
@@ -15,6 +16,9 @@ func GetArtists() ([]models.Artist, error) {
 	defer resp.Body.Close()
 
 	var artists []models.Artist
+	if err := json.NewDecoder(resp.Body).Decode(&artists); err != nil {
+		return nil, err
+	}
 
 	return artists, nil
 }
