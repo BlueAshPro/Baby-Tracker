@@ -6,10 +6,10 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/", gestion.home)
+	http.HandleFunc("/gestion/", gestion.home)
 	http.HandleFunc("/artists", gestion.artists)
 
-	http.HandleFunc("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	http.HandleFunc("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css"))))
 
 	log.Println("Server running on http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
