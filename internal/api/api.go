@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 )
 
 var (
@@ -76,4 +77,22 @@ func GetRelations() ([]Date, error) {
 	var relations []Date
 	err = json.NewDecoder(resp.Body).Decode(&relations)
 	return relations, err
+}
+
+// SearchArtist filtre les artistes par nom en mémoire
+func SearchArtist(query string) ([]Artist, error) {
+	artists, err := GetArtists()
+	if err != nil {
+		return nil, err
+	}
+
+	q := strings.ToLower(query)
+	filtered := make([]Artist, 0)
+	for _, a := range artists {
+		if strings.Contains(strings.ToLower(a.Name), q) {
+			filtered = append(filtered, a)
+		}
+	}
+
+	return filtered, nil
 }

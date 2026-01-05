@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"groupie-tracker/internal/api"
+	"groupie-tracker-gui/internal/api"
 )
 
 func Search(w http.ResponseWriter, r *http.Request) {

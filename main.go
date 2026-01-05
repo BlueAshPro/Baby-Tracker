@@ -1,7 +1,7 @@
 package main
 
 import (
-	"groupie-tracker/internal/gestion"
+	"groupie-tracker-gui/internal/gestion"
 	"log"
 	"net/http"
 )
