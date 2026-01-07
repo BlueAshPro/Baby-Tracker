@@ -1,6 +1,32 @@
 /* Page d'accueil */
 
-.body_ accueil{
+.navbar_test {
+    position: absolute;
+    background-color: rgb(100, 100, 100);
+    width: 300px;
+    height: 50px;
+    margin-top: 10px;
+    margin-left: 800px;
+    border-radius: 15px;
+    border: none;
+}
+
+.btn_navbar {
+    position: absolute;
+    background-color: lightblue;
+    width: 100px;
+    height: 52px;
+    margin-top: 10px;
+    margin-left: 1010px;
+    border-radius: 15px;
+    border: none;
+}
+
+.txt_align {
+    text-align: center;
+}
+
+.body_accueil{
     background-color: white;
 }
 
@@ -508,15 +534,106 @@
     border-radius: 15px;
 }
 
-.input_incription {
+.input_inscription {
     position: absolute;
-    background-color: rgb(217, 217, 217);
+    background-color: rgb(187, 187, 187);
     width: 500px;
     height: 40px;
     border-radius: 15px;
+    border: none;
 
     &.input_nom {
         margin-top: 100px;
-        margin-left: px;
+        margin-left: 50px;
     }
+
+    &.input_prenom {
+        margin-top: 175px;
+        margin-left: 50px;
+    }
+
+    &.input_mail {
+        margin-top: 250px;
+        margin-left: 50px;
+    }
+
+    &.input_mdp {
+        margin-top: 325px;
+        margin-left: 50px;
+    }
+
+    &.input_conf_mdp {
+        margin-top: 400px;
+        margin-left: 50px;
+    }
+}
+
+.input:hover {
+    color: rgb(150, 150, 150);
+}
+
+/* Page d'artistes */
+
+.bandeau_left {
+    position: absolute;
+    background-color: rgb(170, 170, 170);
+    width: 500px;
+    height: 1000px;
+    margin-left: -10px;
+    margin-top: 120px;
+}
+
+.cadre_photo_artiste {
+    position: absolute;
+    background-color: rgb(200, 200, 200);
+    width: 350px;
+    height: 350px;
+    margin-left: 75px;
+    margin-top: 75px;
+    border-radius: 15px;
+}
+
+.discographie {
+    position: absolute;
+    background-color: rgb(200, 200, 200);
+    width: 800px;
+    height: 70px;
+    margin-left: 600px;
+    margin-top: 200px;
+    border-radius: 15px 15px 0px 15px;
+}
+
+.album {
+    position: absolute;
+    background-color: rgb(170, 170, 170);
+    width: 700px;
+    height: 70px;
+    margin-left: 700px;
+    margin-top: 270px;
+    border-radius: 0px 0px 0px 15px;
+}
+
+.musique {
+    position: absolute;
+    background-color: rgb(150, 150, 150);
+    width: 600px;
+    height: 70px;
+    margin-left: 800px;
+}
+
+.n1 {
+    margin-top: 340px;
+}
+
+.n2 {
+    margin-top: 410px; 
+}
+
+.n3 {
+    margin-top: 480px;
+}
+
+.n4 {
+    margin-top: 550px;
+    border-radius: 0px 0px 15px 15px;
 }
