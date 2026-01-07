@@ -3,69 +3,91 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="spotify.css" rel="stylesheet" />
-        <title>Spotify</title>
+        <link href="/css/styles.css" rel="stylesheet" />
+        <title>{{.Name}} - BabyTrack</title>
     </head>
     <body>
         <div class="header_accueil">
             <div class="cadre_logo_accueil">
-                <p class="txt_header_accueil">Logo</p>
+                <p class="txt_header_accueil">Groupie Tracker</p>
             </div>
             <div class="cadre_titre_accueil">
                 <p class="txt_header_accueil">BabyTrack</p>
             </div>
-            <div class="bouton_inscription">
-                <p class="txt_bouton">S'inscrire</p>
-            </div>
-            <div class="bouton_connexion">
-                <p class="txt_bouton">Se connecter</p>
-            </div>
-            <div class="liserai_accueil"></div>
+            <button class="btn_navbar" onclick="window.location.href='/'">
+                <p>← Retour</p>
+            </button>
         </div>
+        
         <div class="bandeau_accueil">
-            <div class="option accueil">
+            <div class="option" onclick="window.location.href='/'">
                 <p class="txt_option">Accueil</p>
             </div>
-            <div class="option musiques">
-                <p class="txt_option">Musiques</p>
-            </div>
-            <div class="option albums">
-                <p class="txt_option">Albums</p>
-            </div>
-            <div class="option artistes">
+            <div class="option" onclick="window.location.href='/'">
                 <p class="txt_option">Artistes</p>
             </div>
-            <div class="option concerts">
-                <p class="txt_option">Concerts</p>
+        </div>
+
+        <div class="container">
+            <div class="bandeau_left">
+                <div class="cadre_photo_artiste" style="background-image: url('{{.Image}}'); background-size: cover; background-position: center;">
+                </div>
+                <h2>{{.Name}}</h2>
+                <p>Créé en <strong>{{.CreationDate}}</strong></p>
+                <p>Premier album: <strong>{{.FirstAlbum}}</strong></p>
+                <p style="margin-top: 1.5rem;"><strong>Membres ({{len .Members}})</strong></p>
+                {{range .Members}}
+                    <p style="margin-left: 1rem;">• {{.}}</p>
+                {{end}}
             </div>
-            <div class="option assistance">
-                <p class="txt_option">Assistance</p>
-            </div>
-            <div class="option loupe">
-                <img src="loupe.png" alt="loupe.png" class="loupe_accueil">
-            </div>
-        </div>
-        <div class="bandeau_left">
-            <div class="cadre_photo_artiste"></div>
+
+            <div class="cadre_artiste_details">
+                <h3 style="text-align: center; margin-bottom: 1rem;">Concerts & Tournées</h3>
+                
+                <div class="concerts_container" id="concerts-container">
+                    <p style="text-align: center; grid-column: 1 / -1;">Chargement des concerts...</p>
+                </div>
             </div>
         </div>
-        <div class="discographie">
-            <p class="txt_align">Discographie:</p>
-        </div>
-        <div class="album 1">
-            <p class="txt_align">Album 1:</p>
-        </div>
-        <div class="musique n1">
-            <p class="txt_align">Musique 1:</p>
-        </div>
-        <div class="musique n2">
-            <p class="txt_align">Musique 2:</p>
-        </div>
-        <div class="musique n3">
-            <p class="txt_align">Musique 3:</p>
-        </div>
-        <div class="musique n4">
-            <p class="txt_align">Musique 4:</p>
-        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', async function() {
+                const artistId = new URLSearchParams(window.location.search).get('id');
+                
+                if (!artistId) {
+                    console.error('ID artiste manquant');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/api/artist/${artistId}/concerts`);
+                    if (!response.ok) throw new Error('Erreur API');
+                    
+                    const concerts = await response.json();
+                    const container = document.getElementById('concerts-container');
+                    
+                    if (!concerts || concerts.length === 0) {
+                        container.innerHTML = '<p style="grid-column: 1 / -1; text-align: center;">Aucun concert disponible</p>';
+                        return;
+                    }
+
+                    let html = '';
+                    concerts.forEach((concert, index) => {
+                        html += `
+                            <div>
+                                <p>${concert.location}</p>
+                                <p>${concert.date}</p>
+                            </div>
+                        `;
+                    });
+                    
+                    container.innerHTML = html;
+                    console.log(concerts.length + ' concerts chargés');
+                } catch (error) {
+                    console.error('Erreur chargement concerts:', error);
+                    document.getElementById('concerts-container').innerHTML = '<p style="grid-column: 1 / -1; text-align: center;">Erreur lors du chargement des concerts</p>';
+                }
+            });
+        </script>
     </body>
 </html>

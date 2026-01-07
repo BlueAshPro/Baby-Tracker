@@ -2,97 +2,117 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
-	"strings"
+	"time"
+
+	"groupie-tracker/internal/models"
 )
 
-var (
-	ArtistsURL   = "https://groupietrackers.herokuapp.com/api/artists"
-	LocationsURL = "https://groupietrackers.herokuapp.com/api/locations"
-	DatesURL     = "https://groupietrackers.herokuapp.com/api/dates"
-	RelationURL  = "https://groupietrackers.herokuapp.com/api/relation"
+const (
+	BaseURL = "https://groupietrackers.herokuapp.com/api"
+	Timeout = 10 * time.Second
 )
 
-type Artist struct {
-	Id   int    `json:"id"`
-	Name string `json:"name"`
+var httpClient = &http.Client{
+	Timeout: Timeout,
 }
 
-type Location struct {
-	Id   int    `json:"id"`
-	City string `json:"city"`
+func FetchArtists() ([]models.Artist, error) {
+	resp, err := httpClient.Get(BaseURL + "/artists")
+	if err != nil {
+		return nil, fmt.Errorf("erreur de connexion: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("erreur API: status %d", resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("erreur lecture: %w", err)
+	}
+
+	var artists []models.Artist
+	if err := json.Unmarshal(body, &artists); err != nil {
+		return nil, fmt.Errorf("erreur JSON: %w", err)
+	}
+
+	return artists, nil
 }
 
-type Date struct {
-	Id             int                 `json:"id"`
-	DatesLocations map[string][]string `json:"datesLocations"`
+func FetchArtistByID(id int) (*models.Artist, error) {
+	url := fmt.Sprintf("%s/artists/%d", BaseURL, id)
+	resp, err := httpClient.Get(url)
+	if err != nil {
+		return nil, fmt.Errorf("erreur connexion: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, fmt.Errorf("artiste non trouvé")
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("erreur API: status %d", resp.StatusCode)
+	}
+
+	var artist models.Artist
+	if err := json.NewDecoder(resp.Body).Decode(&artist); err != nil {
+		return nil, fmt.Errorf("erreur parsing: %w", err)
+	}
+
+	return &artist, nil
 }
 
-// SearchArtist peut interroger l’API et retourner tous les artistes
-func GetArtists() ([]Artist, error) {
-	resp, err := http.Get(ArtistsURL)
+func FetchLocations() (*models.DateLocation, error) {
+	resp, err := httpClient.Get(BaseURL + "/locations")
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	var artists []Artist
-	err = json.NewDecoder(resp.Body).Decode(&artists)
-	return artists, err
+	var locations models.DateLocation
+	if err := json.NewDecoder(resp.Body).Decode(&locations); err != nil {
+		return nil, err
+	}
+
+	return &locations, nil
 }
 
-// Pareil pour Locations, Dates, Relation
-func GetLocations() ([]Location, error) {
-	resp, err := http.Get(LocationsURL)
+func FetchRelations() (*models.RelationData, error) {
+	resp, err := httpClient.Get(BaseURL + "/relation")
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	var locations []Location
-	err = json.NewDecoder(resp.Body).Decode(&locations)
-	return locations, err
+	var relations models.RelationData
+	if err := json.NewDecoder(resp.Body).Decode(&relations); err != nil {
+		return nil, err
+	}
+
+	return &relations, nil
 }
 
-func GetDates() ([]Date, error) {
-	resp, err := http.Get(DatesURL)
+func FetchRelationByID(id int) (*models.Relation, error) {
+	url := fmt.Sprintf("%s/relation/%d", BaseURL, id)
+	resp, err := httpClient.Get(url)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	var dates []Date
-	err = json.NewDecoder(resp.Body).Decode(&dates)
-	return dates, err
-}
-
-// Relation est spéciale → map dynamique
-func GetRelations() ([]Date, error) {
-	resp, err := http.Get(RelationURL)
-	if err != nil {
-		return nil, err
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("erreur API: status %d", resp.StatusCode)
 	}
-	defer resp.Body.Close()
 
-	var relations []Date
-	err = json.NewDecoder(resp.Body).Decode(&relations)
-	return relations, err
-}
-
-// SearchArtist filtre les artistes par nom en mémoire
-func SearchArtist(query string) ([]Artist, error) {
-	artists, err := GetArtists()
-	if err != nil {
+	var relation models.Relation
+	if err := json.NewDecoder(resp.Body).Decode(&relation); err != nil {
 		return nil, err
 	}
 
-	q := strings.ToLower(query)
-	filtered := make([]Artist, 0)
-	for _, a := range artists {
-		if strings.Contains(strings.ToLower(a.Name), q) {
-			filtered = append(filtered, a)
-		}
-	}
-
-	return filtered, nil
+	return &relation, nil
 }

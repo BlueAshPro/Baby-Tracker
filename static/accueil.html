@@ -3,126 +3,234 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="/css/spotify.css" rel="stylesheet" />
-        <title>Spotify</title>
+        <link href="/css/styles.css" rel="stylesheet" />
+        <title>BabyTrack - Accueil</title>
     </head>
     <body>
         <div class="header_accueil">
             <div class="cadre_logo_accueil">
-                <p class="txt_header_accueil">Logo</p>
+                <p class="txt_header_accueil">Groupie Tracker</p>
             </div>
             <div class="cadre_titre_accueil">
-                <p class="txt_header_accueil">Titre</p>
+                <p class="txt_header_accueil">BabyTrack</p>
             </div>
-            <input type="text" class="navbar_test">
-            <button class="btn_navbar">
-                <p>Rechercher</p>
-            </button>
-            <div class="bouton_inscription">
-                <p class="txt_bouton">S'inscrire</p>
-            </div>
-            <div class="bouton_connexion">
-                <p class="txt_bouton">Se connecter</p>
-            </div>
-            <div class="liserai_accueil"></div>
+            <input type="text" id="searchInput" class="navbar_test" placeholder="Rechercher un artiste..." autocomplete="off">
         </div>
+        
         <div class="bandeau_accueil">
-            <div class="option accueil">
+            <div class="option" onclick="window.location.href='/'" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));">
                 <p class="txt_option">Accueil</p>
             </div>
-            <div class="option musiques">
-                <p class="txt_option">Musiques</p>
-            </div>
-            <div class="option albums">
-                <p class="txt_option">Albums</p>
-            </div>
-            <div class="option artistes">
-                <p class="txt_option">Artistes</p>
-            </div>
-            <div class="option concerts">
-                <p class="txt_option">Concerts</p>
-            </div>
-            <div class="option assistance">
-                <p class="txt_option">Assistance</p>
-            </div>
-            <div class="option loupe">
-                <img src="loupe.png" alt="loupe.png" class="loupe_accueil">
+            <div class="option" onclick="window.location.href='/'">
+                <p class="txt_option">Tous les Artistes</p>
             </div>
         </div>
-        <div class="cadre_stats_accueil">
-            <div class="stats_accueil stats_1">
-                <p class="txt_stats_accueil">Nbr d'écoutes actuel</p>
+        
+        <div class="container">
+            <div class="cadre_stats_accueil">
+                <div class="stats_accueil">
+                    <p class="txt_stats_accueil">Artistes affichés</p>
+                    <h3 id="totalArtists" style="color: var(--primary-color); font-size: 2rem; margin: 0.5rem 0;">--</h3>
+                </div>
             </div>
-            <div class="stats_accueil stats_2">
-                <p class="txt_stats_accueil">Musique la plus écoutée</p>
+
+            <p class="txt_suggestions_accueil">Découvrez les artistes</p>
+            <div style="background: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
+                <h4 style="margin: 0 0 1rem 0; color: #2d3748; font-size: 1.1rem;">Filtres rapides</h4>
+                
+                <!-- Filtres prédéfinis -->
+                <div style="display: flex; gap: 0.8rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                    <button onclick="applyQuickFilter('solo')" style="padding: 0.5rem 1rem; background: #edf2f7; color: #2d3748; border: 2px solid transparent; border-radius: 20px; font-size: 0.85rem; cursor: pointer; transition: all 0.3s; font-weight: 600;" onmouseover="this.style.background='var(--primary-color)'; this.style.color='white'" onmouseout="this.style.background='#edf2f7'; this.style.color='#2d3748'">Artistes solo</button>
+                    <button onclick="applyQuickFilter('group')" style="padding: 0.5rem 1rem; background: #edf2f7; color: #2d3748; border: 2px solid transparent; border-radius: 20px; font-size: 0.85rem; cursor: pointer; transition: all 0.3s; font-weight: 600;" onmouseover="this.style.background='var(--primary-color)'; this.style.color='white'" onmouseout="this.style.background='#edf2f7'; this.style.color='#2d3748'">Groupes</button>
+                    <button onclick="applyQuickFilter('recent')" style="padding: 0.5rem 1rem; background: #edf2f7; color: #2d3748; border: 2px solid transparent; border-radius: 20px; font-size: 0.85rem; cursor: pointer; transition: all 0.3s; font-weight: 600;" onmouseover="this.style.background='var(--primary-color)'; this.style.color='white'" onmouseout="this.style.background='#edf2f7'; this.style.color='#2d3748'">Récents (2000+)</button>
+                    <button onclick="applyQuickFilter('classic')" style="padding: 0.5rem 1rem; background: #edf2f7; color: #2d3748; border: 2px solid transparent; border-radius: 20px; font-size: 0.85rem; cursor: pointer; transition: all 0.3s; font-weight: 600;" onmouseover="this.style.background='var(--primary-color)'; this.style.color='white'" onmouseout="this.style.background='#edf2f7'; this.style.color='#2d3748'">Classiques (avant 2000)</button>
+                </div>
+
+                <!-- Filtres personnalisés -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <label style="display: block; margin-bottom: 0.3rem; color: #4a5568; font-size: 0.85rem; font-weight: 600;">Année de création</label>
+                        <input type="number" id="creationDateMin" placeholder="Ex: 1990" style="width: 100%; padding: 0.7rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.9rem;">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 0.3rem; color: #4a5568; font-size: 0.85rem; font-weight: 600;">Nombre de membres</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="number" id="membersMin" placeholder="Min" style="width: 50%; padding: 0.7rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.9rem;">
+                            <input type="number" id="membersMax" placeholder="Max" style="width: 50%; padding: 0.7rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.9rem;">
+                        </div>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 0.3rem; color: #4a5568; font-size: 0.85rem; font-weight: 600;">Ville de concert</label>
+                        <input type="text" id="locationFilter" placeholder="Ex: Paris, London..." style="width: 100%; padding: 0.7rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.9rem;">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button id="resetBtn" style="padding: 0.7rem 1.5rem; background: #f7fafc; color: #4a5568; border: 2px solid #e2e8f0; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s;">Réinitialiser</button>
+                    <button id="filterBtn" style="padding: 0.7rem 2rem; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);">Appliquer</button>
+                </div>
             </div>
-            <div class="stats_accueil stats_3">
-                <p class="txt_stats_accueil">Album le plus écouté</p>
-            </div>
-            <div class="stats_accueil stats_4">
-                <p class="txt_stats_accueil">Artiste le plus écoué</p>
-            </div>
-            <div class="stats_accueil stats_5">
-                <p class="txt_stats_accueil">Concert en approche</p>
+            <div class="cadre_suggestions_accueil" id="artistsGrid">
+                <div style="grid-column: 1 / -1; text-align: center; padding: 4rem; color: white;">
+                    <div class="spinner"></div>
+                    <p>Chargement des artistes...</p>
+                </div>
             </div>
         </div>
-        <div class="cadre_suggestions_accueil">
-            <p class="txt_suggestions_accueil txt_mu"><u>Musiques :</u></p>
-            <div class="suggestions cadre_mu_1"></div>
-            <p class="txt_noms_suggestions txt_noms_mu_1">Musique 1</p>
-            <div class="suggestions cadre_mu_2"></div>
-            <p class="txt_noms_suggestions txt_noms_mu_2">Musique 2</p>
-            <div class="suggestions cadre_mu_3"></div>
-            <p class="txt_noms_suggestions txt_noms_mu_3">Musique 3</p>
-            <div class="suggestions cadre_mu_4"></div>
-            <p class="txt_noms_suggestions txt_noms_mu_4">Musique 4</p>
-            <div class="suggestions cadre_mu_5"></div>
-            <p class="txt_noms_suggestions txt_noms_mu_5">Musique 5</p>
-            <div class="suggestions cadre_mu_6"></div>
-            <p class="txt_noms_suggestions txt_noms_mu_6">Musique 6</p>
-            <img src="skip.png" alt="skip" class="skip_accueil skip_mu_accueil">
-            <p class="txt_suggestions_accueil txt_al"><u>Albums :</u></p>
-            <div class="suggestions cadre_al_1"></div>
-            <p class="txt_noms_suggestions txt_noms_al_1">Album 1</p>
-            <div class="suggestions cadre_al_2"></div>
-            <p class="txt_noms_suggestions txt_noms_al_2">Album 2</p>
-            <div class="suggestions cadre_al_3"></div>
-            <p class="txt_noms_suggestions txt_noms_al_3">Album 3</p>
-            <div class="suggestions cadre_al_4"></div>
-            <p class="txt_noms_suggestions txt_noms_al_4">Album 4</p>
-            <div class="suggestions cadre_al_5"></div>
-            <p class="txt_noms_suggestions txt_noms_al_5">Album 5</p>
-            <div class="suggestions cadre_al_6"></div>
-            <p class="txt_noms_suggestions txt_noms_al_6">Album 6</p>
-            <img src="skip.png" alt="skip" class="skip_accueil skip_al_accueil">
-            <p class="txt_suggestions_accueil txt_ar"><u>Artistes :</u></p>
-            <div class="suggestions cadre_ar_1"></div>
-            <p class="txt_noms_suggestions txt_noms_ar_1">Artiste 1</p>
-            <div class="suggestions cadre_ar_2"></div>
-            <p class="txt_noms_suggestions txt_noms_ar_2">Artiste 2</p>
-            <div class="suggestions cadre_ar_3"></div>
-            <p class="txt_noms_suggestions txt_noms_ar_3">Artiste 3</p>
-            <div class="suggestions cadre_ar_4"></div>
-            <p class="txt_noms_suggestions txt_noms_ar_4">Artiste 4</p>
-            <div class="suggestions cadre_ar_5"></div>
-            <p class="txt_noms_suggestions txt_noms_ar_5">Artiste 5</p>
-            <div class="suggestions cadre_ar_6"></div>
-            <p class="txt_noms_suggestions txt_noms_ar_6">Artiste 6</p>
-            <img src="skip.png" alt="skip" class="skip_accueil skip_ar_accueil">
-            <p class="txt_suggestions_accueil txt_co"><u>Concerts :</u></p>
-            <div class="suggestions cadre_co_1"></div>
-            <p class="txt_noms_suggestions txt_noms_co_1">Concert 1</p>
-            <div class="suggestions cadre_co_2"></div>
-            <p class="txt_noms_suggestions txt_noms_co_2">Concert 2</p>
-            <div class="suggestions cadre_co_3"></div>
-            <p class="txt_noms_suggestions txt_noms_co_3">Concert 3</p>
-            <div class="suggestions cadre_co_4"></div>
-            <p class="txt_noms_suggestions txt_noms_co_4">Concert 4</p>
-            <div class="suggestions cadre_co_5"></div>
-            <p class="txt_noms_suggestions txt_noms_co_5">Concert 5</p>
-            <div class="suggestions cadre_co_6"></div>
-            <p class="txt_noms_suggestions txt_noms_co_6">Concert 6</p>
-            <img src="skip.png" alt="skip" class="skip_accueil skip_co_accueil">
-        </div>
+
+        <!-- SCRIPT JavaScript -->
+        <script>
+            let cachedArtists = null;
+
+            async function loadArtists() {
+                try {
+                    const response = await fetch('/api/artists');
+                    const artists = await response.json();
+                    cachedArtists = artists;
+                    
+                    if (!artists || artists.length === 0) {
+                        document.getElementById('artistsGrid').innerHTML = '<p style="color: white; text-align: center; grid-column: 1 / -1;">Aucun artiste trouvé</p>';
+                        return;
+                    }
+
+                    document.getElementById('totalArtists').textContent = artists.length;
+
+                    displayArtists(artists);
+
+                    console.log(artists.length + ' artistes chargés');
+                } catch (error) {
+                    console.error('Erreur:', error);
+                    document.getElementById('artistsGrid').innerHTML = '<p style="color: white; text-align: center; grid-column: 1 / -1;">Erreur de chargement</p>';
+                }
+            }
+
+            document.getElementById('filterBtn').addEventListener('click', async () => {
+                const creationDateMin = document.getElementById('creationDateMin').value;
+                const membersMin = document.getElementById('membersMin').value;
+                const membersMax = document.getElementById('membersMax').value;
+                const location = document.getElementById('locationFilter').value.trim();
+
+                let url = '/api/filter?';
+                const params = [];
+                
+                if (creationDateMin) params.push(`creationDateMin=${creationDateMin}`);
+                if (membersMin) params.push(`membersMin=${membersMin}`);
+                if (membersMax) params.push(`membersMax=${membersMax}`);
+                if (location) params.push(`location=${encodeURIComponent(location)}`);
+
+                if (params.length === 0) {
+                    alert('Veuillez entrer au moins un critère de filtre');
+                    return;
+                }
+
+                url += params.join('&');
+
+                try {
+                    const response = await fetch(url);
+                    const results = await response.json();
+                    displayArtists(results);
+                    console.log(results.length + ' résultat(s)');
+                } catch (error) {
+                    console.error('Erreur filtrage:', error);
+                    alert('Erreur lors du filtrage');
+                }
+            });
+
+            document.getElementById('resetBtn').addEventListener('click', () => {
+                document.getElementById('creationDateMin').value = '';
+                document.getElementById('membersMin').value = '';
+                document.getElementById('membersMax').value = '';
+                document.getElementById('locationFilter').value = '';
+                document.getElementById('searchInput').value = '';
+                loadArtists();
+            });
+
+            let searchTimeout;
+            document.getElementById('searchInput').addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                const query = this.value;
+                
+                if (query.length === 0) {
+                    loadArtists();
+                    return;
+                }
+                
+                if (query.length < 2) return;
+                
+                searchTimeout = setTimeout(async () => {
+                    try {
+                        const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+                        const results = await response.json();
+                        displayArtists(results);
+                    } catch (error) {
+                        console.error('Erreur recherche:', error);
+                    }
+                }, 300);
+            });
+
+            function displayArtists(artists) {
+                const grid = document.getElementById('artistsGrid');
+                
+                if (!artists || artists.length === 0) {
+                    grid.innerHTML = '<p style="color: white; text-align: center; grid-column: 1 / -1; padding: 2rem;">Aucun artiste trouvé</p>';
+                    return;
+                }
+
+                document.getElementById('totalArtists').textContent = artists.length;
+                
+                grid.innerHTML = '';
+                artists.forEach(artist => {
+                    const card = document.createElement('div');
+                    card.className = 'suggestions';
+                    card.style.backgroundImage = `url('${artist.image}')`;
+                    card.onclick = () => window.location.href = `/artiste?id=${artist.id}`;
+                    
+                    const name = document.createElement('div');
+                    name.className = 'txt_noms_suggestions';
+                    name.textContent = artist.name;
+                    
+                    card.appendChild(name);
+                    grid.appendChild(card);
+                });
+            }
+
+            function applyQuickFilter(type) {
+                document.getElementById('creationDateMin').value = '';
+                document.getElementById('membersMin').value = '';
+                document.getElementById('membersMax').value = '';
+                document.getElementById('locationFilter').value = '';
+
+                let url = '/api/filter?';
+                const params = [];
+
+                switch(type) {
+                    case 'solo':
+                        document.getElementById('membersMin').value = '1';
+                        document.getElementById('membersMax').value = '1';
+                        params.push('membersMin=1', 'membersMax=1');
+                        break;
+                    case 'group':
+                        document.getElementById('membersMin').value = '2';
+                        params.push('membersMin=2');
+                        break;
+                    case 'recent':
+                        document.getElementById('creationDateMin').value = '2000';
+                        params.push('creationDateMin=2000');
+                        break;
+                    case 'classic':
+                        params.push('creationDateMax=1999');
+                        break;
+                }
+                
+                if (params.length > 0) {
+                    url += params.join('&');
+                    fetch(url)
+                        .then(response => response.json())
+                        .then(results => displayArtists(results))
+                        .catch(error => console.error('Erreur:', error));
+                }
+            }
+
+            window.addEventListener('DOMContentLoaded', loadArtists);
+        </script>
     </body>
 </html>

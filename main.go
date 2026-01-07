@@ -1,23 +1,43 @@
 package main
 
 import (
-	"groupie-tracker-gui/internal/gestion"
+	"fmt"
 	"log"
 	"net/http"
+
+	"groupie-tracker/internal/gestion"
 )
 
 func main() {
+	printBanner()
 
-	http.HandleFunc("/gestion/", gestion.Home)
-	http.HandleFunc("/artists", gestion.Artists)
-	http.HandleFunc("/search", gestion.Search) // Barre de recherche
+	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css"))))
 
 	http.HandleFunc("/", gestion.Home)
+	http.HandleFunc("/artiste", gestion.ArtistePage)
+	http.HandleFunc("/api/search", gestion.SearchArtists)
+	http.HandleFunc("/api/filter", gestion.FilterArtists)
+	http.HandleFunc("/api/artist/", gestion.ArtistDetailsAPI)
+	http.HandleFunc("/api/artists", gestion.GetAllArtists)
 
-	cssFS := http.FileServer(http.Dir("./css/"))
-	http.Handle("/css/", http.StripPrefix("/css/", cssFS))
-	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("js"))))
-	http.Handle("/static/accueil/", http.StripPrefix("/static/accueil/", http.FileServer(http.Dir("static/accueil"))))
+	printServerInfo()
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	port := ":8080"
+	log.Fatal(http.ListenAndServe(port, nil))
+}
+
+func printBanner() {
+	fmt.Println("================================")
+	fmt.Println("   GROUPIE TRACKER SERVER")
+	fmt.Println("================================")
+}
+
+func printServerInfo() {
+	fmt.Println("\nServeur démarré sur http://localhost:8080")
+	fmt.Println("\nEndpoints:")
+	fmt.Println("  GET  /")
+	fmt.Println("  GET  /artiste?id=X")
+	fmt.Println("  GET  /api/search?q=XXX")
+	fmt.Println("  GET  /api/filter")
+	fmt.Println("================================\n")
 }
