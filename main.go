@@ -19,6 +19,5 @@ func main() {
 	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("js"))))
 	http.Handle("/static/accueil/", http.StripPrefix("/static/accueil/", http.FileServer(http.Dir("static/accueil"))))
 
-	log.Println("Server running on http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
