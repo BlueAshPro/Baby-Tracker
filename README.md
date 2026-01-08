@@ -1,427 +1,163 @@
-# Groupie-Tracker - Documentation Technique
+# Baby Track
+
+**Projet web en Go — Visualisation et filtrage d’artistes musicaux**
+
+---
+
+## Présentation du projet
+
+**Baby Track** est une application web développée en **Go (Golang)** qui consomme l’API publique **Groupie Tracker** afin d’afficher des informations sur des artistes et groupes de musique :
+
+- nom  
+- membres  
+- dates de création  
+- concerts et localisations  
+
+Le projet repose sur une **architecture serveur simple** 
+
+- du routage HTTP  
+- de la consommation d’API  
+- de la séparation des responsabilités  
+- du rendu HTML côté serveur  
+
+---
 
 ## Architecture Générale
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     Frontend (HTML/CSS/JS)                   │
-│              (accueil.html, artiste.html)                    │
-└──────────────────────┬──────────────────────────────────────┘
-                       │ HTTP Requests
-                       │
-┌──────────────────────▼──────────────────────────────────────┐
-│                   main.go (Server Router)                     │
-│  - http.HandleFunc("/", gestion.Home)                        │
-│  - http.HandleFunc("/artiste", gestion.ArtistePage)          │
-│  - http.HandleFunc("/api/artists", gestion.GetAllArtists)    │
-│  - http.HandleFunc("/api/search", gestion.SearchArtists)     │
-│  - http.HandleFunc("/api/filter", gestion.FilterArtists)     │
-│  - http.HandleFunc("/api/artist/", gestion.ArtistDetailsAPI) │
-└──────────────────────┬──────────────────────────────────────┘
-                       │
-        ┌──────────────┼──────────────┐
-        │              │              │
-   ┌────▼────┐  ┌─────▼─────┐  ┌────▼─────┐
-   │ gestion  │  │ gestion   │  │ internal  │
-   │ handlers │  │ searches/ │  │ api       │
-   │          │  │ filters   │  │           │
-   └─────┬────┘  └─────┬─────┘  └────┬─────┘
-         │             │             │
-    ┌────▼─────────────▼─────────────▼────┐
-    │   internal/api/api.go                 │
-    │  (API Wrapper - Groupie Tracker)      │
-    │  - FetchArtists()                     │
-    │  - FetchArtistByID(id)                │
-    │  - FetchRelationByID(id)              │
-    │  - FetchRelations()                   │
-    │  - FetchLocations()                   │
-    └────┬──────────────────────────────────┘
-         │
-         │ HTTP GET
-         │
-    ┌────▼───────────────────────────────────────┐
-    │  External API                               │
-    │  https://groupietrackers.herokuapp.com/api  │
-    │  /artists, /artists/{id}, /relation/{id}    │
-    └─────────────────────────────────────────────┘
-```
+┌───────────────────────────────────────────────────────────────┐
+│                     Frontend (HTML / CSS)                     │
+│              accueil.html • artiste.html                      │
+└───────────────────────────┬───────────────────────────────────┘
+                            │ HTTP Requêtes
+                            │
+┌───────────────────────────▼───────────────────────────────────┐
+│                     main.go (Router HTTP)                     │
+│        - Déclaration des routes                               │
+│        - Lancement du serveur                                 │
+└───────────────────────────┬───────────────────────────────────┘
+                            │
+            ┌───────────────┼────────────────┐
+            │               │                │
+┌───────────▼───────────┐ ┌─▼────────────┐ ┌─▼────────────────┐
+│ gestion / handlers    │ │ gestion /    │ │ internal / api   │
+│                       │ │ recherche &  │ │                  │
+│ - Pages HTML          │ │ filter       │ │ - Appels HTTP    │
+│ - Endpoints API       │ │              │ │ - API externe    │
+└───────────┬───────────┘ └─┬────────────┘ └─┬────────────────┘
+            │               │                │
+            └───────────────┴────────────────┘
+                            │
+┌───────────────────────────▼───────────────────────────────────┐
+│              API – Groupie Tracker                            │
+│        - Récupération des artistes                            │
+│        - Relations concerts / lieux                           │
+└───────────────────────────────────────────────────────────────┘
 
-## Flux d'une Requête HTTP
 
-### 1. Requête Homepage: GET /
+---
 
-```
-Browser                  main.go            gestion.Home         os.ReadFile()
-  │                        │                    │                    │
-  ├─ GET / ───────────────>│                    │                    │
-  │                        ├── route to Home ──>│                    │
-  │                        │                    ├─ vérifier URL ────>│
-  │                        │                    │    (doit être "/") │
-  │                        │                    │                    │
-  │                        │                    ├─ lire static/accueil.html
-  │                        │                    │                    │
-  │<─ HTML content ────────┼────────────────────┤                    │
-  │                        │                    │                    │
-```
+## Principe de Fonctionnement
 
-**Code: `internal/gestion/home.go`**
-```go
-func Home(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		http.NotFound(w, r)
-		return
-	}
-	
-	data, err := os.ReadFile("static/accueil.html")
-	if err != nil {
-		log.Printf("Erreur lecture fichier: %v", err)
-		http.Error(w, "Erreur de chargement", http.StatusInternalServerError)
-		return
-	}
-	
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	w.Write(data)
-}
-```
+### 1. Page d’accueil `/`
 
-### 2. Requête API: GET /api/artists
+- Sert une page HTML statique  
+- Chargement initial de tous les artistes via l’API interne  
+- Affichage sous forme de cartes  
 
-```
-Frontend JS           main.go          gestion.GetAllArtists    api.FetchArtists()
-     │                  │                      │                       │
-     ├─ fetch() ───────>│                      │                       │
-     │                  ├─ route to /api/artists ──>                   │
-     │                  │                      ├─ appel api ──────────>│
-     │                  │                      │                       │
-     │                  │                      │  ┌─────────────────┐  │
-     │                  │                      │  │ Connexion HTTP  │  │
-     │                  │                      │  │ vers API externe│  │
-     │                  │                      │  └─────────────────┘  │
-     │                  │                      │                       │
-     │<─ JSON array ────┼──────────────────────┤                       │
-     │                  │                      │                       │
-```
+### 2. API interne `/api/artists`
 
-**Code: `internal/gestion/get_artists.go`**
-```go
-func GetAllArtists(w http.ResponseWriter, r *http.Request) {
-	artists, err := api.FetchArtists()
-	if err != nil {
-		log.Printf("Erreur fetch artistes: %v", err)
-		http.Error(w, "Erreur serveur", http.StatusInternalServerError)
-		return
-	}
-	
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(artists)
-}
-```
+- Point d’entrée JSON  
+- Sert de passerelle entre le frontend et l’API externe  
+- Centralise les appels réseau  
 
-### 3. Requête Recherche: GET /api/search?q=metallica
+### 3. Recherche `/api/search`
 
-```
-Frontend JS           main.go            gestion.SearchArtists    api.FetchArtists()
-     │                  │                      │                       │
-     ├─ fetch() ───────>│                      │                       │
-     │ ?q=metallica     ├─ route to /api/search ──>                   │
-     │                  │                      ├─ fetch tous artistes ─>
-     │                  │                      │                       │
-     │                  │                      │  ┌──────────────────┐ │
-     │                  │                      │  │ Filtre par nom   │ │
-     │                  │                      │  │ strings.Contains │ │
-     │                  │                      │  └──────────────────┘ │
-     │                  │                      │                       │
-     │<─ JSON results ──┼──────────────────────┤                       │
-```
+- Recherche textuelle côté serveur  
+- Insensible à la casse  
+- Optimisée pour limiter les appels réseau  
 
-**Code: `internal/gestion/search.go`**
-```go
-func SearchArtists(w http.ResponseWriter, r *http.Request) {
-	query := strings.TrimSpace(r.URL.Query().Get("q"))
-	if query == "" {
-		http.Error(w, "Paramètre de recherche manquant", http.StatusBadRequest)
-		return
-	}
-	
-	query = strings.ToLower(query)
-	
-	artists, err := api.FetchArtists()
-	if err != nil {
-		log.Printf("Erreur fetch: %v", err)
-		http.Error(w, "Erreur serveur", http.StatusInternalServerError)
-		return
-	}
-	
-	results := make([]models.Artist, 0)
-	for _, artist := range artists {
-		if strings.Contains(strings.ToLower(artist.Name), query) {
-			results = append(results, artist)
-		}
-	}
-	
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(results)
-}
-```
+### 4. Filtres `/api/filter`
 
-### 4. Requête Filtre: GET /api/filter?creationDateMin=2000&membersMin=4
+Filtres combinables :
+- date de création  
+- nombre de membres  
+- localisation  
 
-```
-Frontend JS           main.go          gestion.FilterArtists    api.FetchArtists()
-     │                  │                      │                       │
-     ├─ fetch() ───────>│                      │                       │
-     │ ?creationDate... ├─ route to /api/filter ──>                   │
-     │ &membersMin...   │                      ├─ extract params      │
-     │                  │                      ├─ fetch artistes ─────>
-     │                  │                      │                       │
-     │                  │                      │  ┌──────────────────┐ │
-     │                  │                      │  │ Appliquer filtres│ │
-     │                  │                      │  │ - création date  │ │
-     │                  │                      │  │ - membres count  │ │
-     │                  │                      │  │ - location       │ │
-     │                  │                      │  └──────────────────┘ │
-     │                  │                      │                       │
-     │<─ JSON filtered ──┼──────────────────────┤                       │
-```
+### 5. Page artiste `/artiste?id=X`
 
-**Code: `internal/gestion/filter.go`**
-```go
-func FilterArtists(w http.ResponseWriter, r *http.Request) {
-	params := r.URL.Query()
-	creationMin := params.Get("creationDateMin")
-	creationMax := params.Get("creationDateMax")
-	membersMin := params.Get("membersMin")
-	membersMax := params.Get("membersMax")
-	location := strings.ToLower(strings.TrimSpace(params.Get("location")))
-	
-	artists, err := api.FetchArtists()
-	if err != nil {
-		log.Printf("Erreur fetch: %v", err)
-		http.Error(w, "Erreur serveur", http.StatusInternalServerError)
-		return
-	}
-	
-	// Conversion paramètres (optimisation - une seule fois)
-	var minYear, maxYear, minMembers, maxMembers int
-	var hasMinYear, hasMaxYear, hasMinMembers, hasMaxMembers bool
-	
-	if creationMin != "" {
-		if val, err := strconv.Atoi(creationMin); err == nil {
-			minYear = val
-			hasMinYear = true
-		}
-	}
-	
-	results := make([]models.Artist, 0, len(artists))
-	
-	for _, artist := range artists {
-		if hasMinYear && artist.CreationDate < minYear {
-			continue
-		}
-		if hasMaxYear && artist.CreationDate > maxYear {
-			continue
-		}
-		
-		memberCount := len(artist.Members)
-		if hasMinMembers && memberCount < minMembers {
-			continue
-		}
-		if hasMaxMembers && memberCount > maxMembers {
-			continue
-		}
-		
-		results = append(results, artist)
-	}
-	
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(results)
-}
-```
+- Page dynamique générée côté serveur  
+- Données spécifiques à un artiste  
+- Intégration des concerts et localisations  
 
-### 5. Requête Page Artiste: GET /artiste?id=1
+---
 
-```
-Browser               main.go           gestion.ArtistePage    api.FetchArtistByID
-   │                    │                     │                        │
-   ├─ GET /artiste ────>│                     │                        │
-   │  ?id=1             ├─ route ────────────>│                        │
-   │                    │                     ├─ extract ID           │
-   │                    │                     ├─ fetch artist ───────>
-   │                    │                     │                        │
-   │                    │                     │  ┌─────────────────┐   │
-   │                    │                     │  │ HTTP GET         │   │
-   │                    │                     │  │ /artists/1       │   │
-   │                    │                     │  └─────────────────┘   │
-   │                    │                     │                        │
-   │                    │                     ├─ parse template       │
-   │                    │                     ├─ execute (data)       │
-   │                    │                     │                        │
-   │<─ HTML artiste ───┼─────────────────────┤                        │
-```
+## Structure du Projet
 
-**Code: `internal/gestion/artists.go`**
-```go
-func ArtistePage(w http.ResponseWriter, r *http.Request) {
-	idStr := r.URL.Query().Get("id")
-	if idStr == "" {
-		http.Error(w, "ID manquant", http.StatusBadRequest)
-		return
-	}
-	
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		http.Error(w, "ID invalide", http.StatusBadRequest)
-		return
-	}
-	
-	artist, err := api.FetchArtistByID(id)
-	if err != nil {
-		log.Printf("Erreur fetch artiste %d: %v", id, err)
-		http.Error(w, "Artiste non trouvé", http.StatusNotFound)
-		return
-	}
-	
-	tmpl, err := template.ParseFiles("static/artiste.html")
-	if err != nil {
-		log.Printf("Erreur template: %v", err)
-		http.Error(w, "Erreur template", http.StatusInternalServerError)
-		return
-	}
-	
-	if err := tmpl.Execute(w, artist); err != nil {
-		log.Printf("Erreur execution: %v", err)
-		http.Error(w, "Erreur affichage", http.StatusInternalServerError)
-	}
-}
-```
+groupie-tracker/
+│
+├── main.go # Point d’entrée du serveur
+│
+├── internal/
+│ ├── api/ # Communication API externe
+│ ├── gestion/ # Handlers HTTP
+│ └── models/ # Structures de données
+│
+├── static/
+│ ├── accueil.html
+│ └── artiste.html
+│
+├── css/
+│ └── style.css
+│
+└── go.mod / go.sum
 
-## Structure des Fichiers
 
-### `main.go`
-- **Responsabilité**: Configuration du serveur et des routes
-- **Fonctions**:
-  - `main()`: Lance le serveur sur :8080
-  - `printBanner()`: Affiche le message de démarrage
-  - `printServerInfo()`: Liste les endpoints disponibles
+---
 
-```go
-func main() {
-	printBanner()
-	
-	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css"))))
-	
-	http.HandleFunc("/", gestion.Home)
-	http.HandleFunc("/artiste", gestion.ArtistePage)
-	http.HandleFunc("/api/search", gestion.SearchArtists)
-	http.HandleFunc("/api/filter", gestion.FilterArtists)
-	http.HandleFunc("/api/artist/", gestion.ArtistDetailsAPI)
-	http.HandleFunc("/api/artists", gestion.GetAllArtists)
-	
-	printServerInfo()
-	
-	port := ":8080"
-	log.Fatal(http.ListenAndServe(port, nil))
-}
-```
+## API Externe Utilisée
 
-### `internal/api/api.go`
-- **Responsabilité**: Communication avec l'API externe Groupie Tracker
-- **Configuration**:
-  - `BaseURL = "https://groupietrackers.herokuapp.com/api"`
-  - `Timeout = 10 * time.Second`
-  - `httpClient` partagé pour toutes les requêtes
+**Groupie Tracker API (publique)**  
+Elle fournit toutes les données nécessaires au projet.
 
-- **Fonctions**:
-  - `FetchArtists()` → GET /artists → []models.Artist
-  - `FetchArtistByID(id)` → GET /artists/{id} → *models.Artist
-  - `FetchRelationByID(id)` → GET /relation/{id} → *models.Relation
-  - `FetchRelations()` → GET /relation → *models.RelationData
-  - `FetchLocations()` → GET /locations → *models.DateLocation
+Documentation officielle :  
+👉 https://groupietrackers.herokuapp.com/api
 
-### `internal/models/models.go`
-- **Responsabilité**: Structures de données
+Endpoints principaux :
+- `/artists`  
+- `/artists/{id}`  
+- `/relation/{id}`  
+- `/locations`  
 
-```go
-type Artist struct {
-	ID           int      `json:"id"`
-	Image        string   `json:"image"`
-	Name         string   `json:"name"`
-	Members      []string `json:"members"`
-	CreationDate int      `json:"creationDate"`
-	FirstAlbum   string   `json:"firstAlbum"`
-	Locations    string   `json:"locations"`
-	ConcertDates string   `json:"concertDates"`
-	Relations    string   `json:"relations"`
-}
+---
 
-type Relation struct {
-	ID             int                 `json:"id"`
-	DatesLocations map[string][]string `json:"datesLocations"`
-}
-```
+## Documentation et Références Officielles
 
-### `internal/gestion/*.go` - Handlers HTTP
+### Go / Backend
 
-| Fichier | Route | Fonction |
-|---------|-------|----------|
-| `home.go` | `GET /` | Servir static/accueil.html |
-| `artists.go` | `GET /artiste?id=X` | Servir template artiste.html |
-| `get_artists.go` | `GET /api/artists` | Retourner JSON de tous les artistes |
-| `search.go` | `GET /api/search?q=XXX` | Rechercher artistes par nom |
-| `filter.go` | `GET /api/filter?...` | Filtrer par critères multiples |
-| `api_details.go` | `GET /api/artist/{id}/concerts` | Retourner concerts d'un artiste |
+- Documentation officielle Go  
+  https://go.dev/doc/
 
-## Points d'Optimisation
+- Package `net/http`  
+  https://pkg.go.dev/net/http
 
-### 1. Cache Frontend
-```javascript
-let cachedArtists = null;
+- Templates HTML en Go  
+  https://pkg.go.dev/html/template
 
-async function loadArtists() {
-	const response = await fetch('/api/artists');
-	const artists = await response.json();
-	cachedArtists = artists;
-	displayArtists(artists);
-}
-```
+- Encodage JSON  
+  https://pkg.go.dev/encoding/json
 
-### 2. Conversion Paramètres Une Seule Fois
-```go
-// Conversion avant la boucle, pas à l'intérieur
-minYear, _ := strconv.Atoi(params.Get("creationDateMin"))
-for _, artist := range artists {
-	if artist.CreationDate < minYear { continue }
-}
-```
+### HTTP & Web
 
-### 3. Débounce Recherche (300ms)
-```javascript
-let searchTimeout;
-searchInput.addEventListener('input', function() {
-	clearTimeout(searchTimeout);
-	searchTimeout = setTimeout(() => {
-		fetch(`/api/search?q=${this.value}`);
-	}, 300);
-});
-```
+- HTTP Status Codes  
+  https://developer.mozilla.org/fr/docs/Web/HTTP/Status
 
-## Endpoints Disponibles
+- Méthodes HTTP  
+  https://developer.mozilla.org/fr/docs/Web/HTTP/Methods
 
-| Méthode | Route | Paramètres | Retour |
-|---------|-------|-----------|--------|
-| GET | `/` | - | HTML |
-| GET | `/artiste` | `id` (int) | HTML |
-| GET | `/api/artists` | - | JSON []Artist |
-| GET | `/api/search` | `q` (string) | JSON []Artist |
-| GET | `/api/filter` | `creationDateMin`, `creationDateMax`, `membersMin`, `membersMax`, `location` | JSON []Artist |
-| GET | `/api/artist/{id}/concerts` | `id` (dans URL) | JSON []ConcertData |
+### Frontend
 
-## Installation et Lancement
+- Fetch API  
+  https://developer.mozilla.org/fr/docs/Web/API/Fetch_API
 
-```bash
-go mod download
-go build -o groupie-tracker.exe
-./groupie-tracker.exe
-```
-
-Puis ouvrir http://localhost:8080
+- Manipulation du DOM  
+  https://developer.mozilla.org/fr/docs/Web/API/Document_Object_Model
