@@ -24,6 +24,7 @@ Le projet repose sur une **architecture serveur simple**
 
 ## Architecture Générale
 
+```
 ┌───────────────────────────────────────────────────────────────┐
 │                     Frontend (HTML / CSS)                     │
 │              accueil.html • artiste.html                      │
@@ -52,7 +53,7 @@ Le projet repose sur une **architecture serveur simple**
 │        - Récupération des artistes                            │
 │        - Relations concerts / lieux                           │
 └───────────────────────────────────────────────────────────────┘
-
+```
 
 ---
 
@@ -93,6 +94,7 @@ Filtres combinables :
 
 ## Structure du Projet
 
+```
 groupie-tracker/
 │
 ├── main.go # Point d’entrée du serveur
@@ -110,7 +112,7 @@ groupie-tracker/
 │ └── style.css
 │
 └── go.mod / go.sum
-
+```
 
 ---
 
