@@ -8,9 +8,7 @@
     </head>
     <body>
         <div class="header_accueil">
-            <div class="cadre_header_accueil">
-                <p class="txt_header_accueil">Groupie Tracker</p>
-            </div>
+            <img src="/css/logoff.png" alt="Logo_babytrack" class="logo_header">
             <div class="cadre_header_accueil">
                 <p class="txt_header_accueil">BabyTrack</p>
             </div>
@@ -19,7 +17,7 @@
             </form>
         </div>
         <div class="bandeau_accueil">
-            <div class="option option_active" onclick="window.location.href='/'">
+            <div class="option" onclick="window.location.href='/'">
                 <p class="txt_option">Accueil</p>
             </div>
             <div class="option" onclick="window.location.href='/'">
@@ -30,48 +28,48 @@
             <div class="cadre_stats_accueil">
                 <div class="stats_accueil">
                     <p class="txt_stats_accueil">Artistes affichés</p>
-                    <h3 id="totalArtists" class="stats_value">{{len .Artists}}</h3>
+                    <h3 id="totalArtists" class="stats_valeur">{{len .Artists}}</h3>
                 </div>
             </div>
             <p class="txt_suggestions_accueil">Découvrez les artistes</p>
-            <form action="/api/filter" method="GET" class="filters_form">
-                <div class="filters_panel">
-                    <h4 class="filters_title">Filtres rapides</h4>
+            <form action="/api/filter" method="GET" class="taille_cadre_filtre">
+                <div class="cadre_filtres">
+                    <h4 class="titre_filtres">Filtres rapides</h4>
                     
-                    <div class="filters_grid">
+                    <div class="dispo_filtres">
                         <div>
-                            <label class="filters_label">Année de création</label>
-                            <input type="number" name="creationDateMin" class="filters_input" placeholder="Ex: 1990">
+                            <label class="label_filtres">Année de création</label>
+                            <input type="number" name="creationDateMin" class="inputs_filtres" placeholder="Ex: 1990">
                         </div>
                         <div>
-                            <label class="filters_label">Année 1er album</label>
-                            <input type="number" name="firstAlbumYear" class="filters_input" placeholder="Ex: 1995">
+                            <label class="label_filtres">Année 1er album</label>
+                            <input type="number" name="firstAlbumYear" class="inputs_filtres" placeholder="Ex: 1995">
                         </div>
                         <div>
-                            <label class="filters_label">Nombre de membres</label>
-                            <div class="filters_range">
-                                <input type="number" name="membersMin" class="filters_input" placeholder="Min">
-                                <input type="number" name="membersMax" class="filters_input" placeholder="Max">
+                            <label class="label_filtres">Nombre de membres</label>
+                            <div class="filtres_min_max">
+                                <input type="number" name="membersMin" class="inputs_filtres" placeholder="Min">
+                                <input type="number" name="membersMax" class="inputs_filtres" placeholder="Max">
                             </div>
                         </div>
                         <div>
-                            <label class="filters_label">Ville de concert</label>
-                            <input type="text" name="location" class="filters_input" placeholder="Ex: Paris, London...">
+                            <label class="label_filtres">Ville de concert</label>
+                            <input type="text" name="location" class="inputs_filtres" placeholder="Ex: Paris, London...">
                         </div>
                     </div>
-                    <div class="filters_actions">
-                        <a href="/" class="btn_filter_reset">Réinitialiser</a>
-                        <button type="submit" class="btn_filter_apply">Appliquer</button>
+                    <div class="boutons_filtres">
+                        <a href="/" class="bouton_reset">Réinitialiser</a>
+                        <button type="submit" class="bouton_appliquer">Appliquer</button>
                     </div>
                 </div>
             </form>
-            <div class="cadre_suggestions_accueil" id="artistsGrid">
+            <div class="dispo_artistes_accueil" id="artistsGrid">
                 {{range .Artists}}
-                <div class="suggestions artist_card" style="background-image: url('{{.Image}}');" onclick="window.location.href='/artiste?id={{.ID}}'">
+                <div class="suggestions carte_artiste" style="background-image: url('{{.Image}}');" onclick="window.location.href='/artiste?id={{.ID}}'">
                     <div class="txt_noms_suggestions">{{.Name}}</div>
                 </div>
                 {{else}}
-                <p class="grid_message">Aucun artiste disponible</p>
+                <p class="message_pas_artistes">Aucun artiste disponible</p>
                 {{end}}
             </div>
         </div>

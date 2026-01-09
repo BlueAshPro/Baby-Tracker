@@ -10,6 +10,7 @@ import (
 	"groupie-tracker/internal/models"
 )
 
+// Points de configuration de l'API distante (URL et timeout HTTP).
 const (
 	BaseURL = "https://groupietrackers.herokuapp.com/api"
 	Timeout = 10 * time.Second
@@ -19,6 +20,7 @@ var httpClient = &http.Client{
 	Timeout: Timeout,
 }
 
+// FetchArtists récupère la liste complète des artistes depuis l'API.
 func FetchArtists() ([]models.Artist, error) {
 	resp, err := httpClient.Get(BaseURL + "/artists")
 	if err != nil {
@@ -43,6 +45,7 @@ func FetchArtists() ([]models.Artist, error) {
 	return artists, nil
 }
 
+// FetchArtistByID récupère un artiste par son identifiant.
 func FetchArtistByID(id int) (*models.Artist, error) {
 	url := fmt.Sprintf("%s/artists/%d", BaseURL, id)
 	resp, err := httpClient.Get(url)
@@ -67,21 +70,7 @@ func FetchArtistByID(id int) (*models.Artist, error) {
 	return &artist, nil
 }
 
-func FetchLocations() (*models.DateLocation, error) {
-	resp, err := httpClient.Get(BaseURL + "/locations")
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	var locations models.DateLocation
-	if err := json.NewDecoder(resp.Body).Decode(&locations); err != nil {
-		return nil, err
-	}
-
-	return &locations, nil
-}
-
+// FetchRelations récupère toutes les relations artiste → concerts/lieux.
 func FetchRelations() (*models.RelationData, error) {
 	resp, err := httpClient.Get(BaseURL + "/relation")
 	if err != nil {
@@ -97,6 +86,7 @@ func FetchRelations() (*models.RelationData, error) {
 	return &relations, nil
 }
 
+// FetchRelationByID récupère les relations pour un artiste donné.
 func FetchRelationByID(id int) (*models.Relation, error) {
 	url := fmt.Sprintf("%s/relation/%d", BaseURL, id)
 	resp, err := httpClient.Get(url)

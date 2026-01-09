@@ -14,7 +14,7 @@
     --coins: 12px;
     
     /* Transitions*/
-    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Transition fluide 0.3 secondes */
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Reset les parametres des navigateurs */
@@ -35,13 +35,17 @@ body {
     position: sticky;
     top: 0;
     background: linear-gradient(135deg, rgba(255, 255, 255) 0%, rgba(255, 255, 255) 100%);
-    box-shadow: var(--ombre);   /* Ombre portée */
+    box-shadow: var(--ombre);
     padding: 16px 32px;          /* Espacement interne: 16px haut/bas, 32px gauche/droite */
-    
-    /* Flexbox : disposition flexible des éléments enfants */
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+.logo_header {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--coins);
 }
 
 .cadre_header_accueil {
@@ -62,36 +66,33 @@ body {
 
 .navbar_test {
     flex: 1;                    /* Prend l'espace disponible */
-    padding: 12.8px 19.2px;     /* Espacement interne */
+    padding: 12.8px 19.2px;
     background: var(--fond_clair);
-    border: 2px solid var(--border_color);  /* Bordure de 2px */
+    border: 2px solid var(--border_color);
     border-radius: var(--coins);
     font-size: 16px;
-    transition: var(--transition);  /* Animation fluide */
+    transition: var(--transition);
+    width: 100%;
+    margin: 0;
 }
 
-/* Focus du champ de recherche: met en valeur la bordure */
+/* Animation searchbar */
 .navbar_test:focus {
     outline: none;                          /* Enlève le contour par défaut */
-    border-color: var(--color1);     /* Change la couleur de bordure */
+    border-color: var(--color1);
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); /* Halo lumineux autour */
 }
 
-/* .search_form: conteneur du champ de recherche */
+/* Searchbar */
 .search_form {
     flex: 1;
+    width: 100%;
     min-width: 250px;
     max-width: 400px;
     margin: 0;
 }
 
-.search_form .navbar_test {
-    width: 100%;   /* Largeur complète du parent */
-    margin: 0;
-}
-
-/* .btn_navbar: style des boutons principaux (couleur, arrondi, hover) */
-.btn_navbar {
+.btn_retour {
     padding: 12.8px 32px;
     background: linear-gradient(135deg, var(--color1), var(--color2));
     color: white;
@@ -103,19 +104,17 @@ body {
     font-size: 16px;
 }
 
-/* Hover du bouton: ombre uniquement (petit soulèvement retiré) */
-.btn_navbar:hover {
+.btn_retour:hover {
     box-shadow: var(--ombre_survol); /* Ombre plus prononcée */
 }
 
-.btn_navbar p {
+.btn_retour p {
     margin: 0;
 }
 
-/* .bandeau_accueil: barre de navigation contenant les onglets */
+/* Bandeau sous le header */
 .bandeau_accueil {
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.7)); /* Dégradé horizontal */
-    /* backdrop-filter removed (subtle) */
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.7));
     padding: 16px 32px;
     display: flex;
     gap: 16px;                       /* Espace entre les éléments */
@@ -145,55 +144,31 @@ body {
     background: linear-gradient(135deg, var(--color1), var(--color2));
     color: white;
     border-color: transparent;      /* Rend la bordure invisible */
-    /* small translate removed */
     box-shadow: var(--ombre_survol);
 }
 
-/* .option_active: apparence d'un onglet actif */
-.option_active {
-    background: linear-gradient(135deg, var(--color1), var(--color2));
-    color: white;
-    border-color: transparent;
-    box-shadow: var(--ombre_survol);
-}
-
-/* .txt_option: texte à l'intérieur des onglets */
+/* Texte des options du bandeau */
 .txt_option {
     font-size: 15.2px;
     font-weight: 600;
 }
 
-/* .loupe_accueil: icône loupe (taille et hover) */
-.loupe_accueil {
-    width: 30px;
-    height: 30px;
-    opacity: 0.7;
-    transition: var(--transition);
-    cursor: pointer;
-}
-
-.loupe_accueil:hover {
-    opacity: 1;
-    transform: scale(1.1);
-}
-
-/* .container: centre le contenu et limite la largeur */
 .container {
-    max-width: 1400px;   /* Largeur maximale du contenu */
-    margin: 0 auto;      /* Centre horizontalement (auto = automatique) */
-    padding: 32px;       /* Espacement interne */
+    max-width: 1400px;
+    margin: 0 auto;      /* Centre horizontalement */
+    padding: 32px;
 }
 
-/* .cadre_stats_accueil: grille pour cartes de statistiques */
+/* Disposition cadre artistes affichés */
 .cadre_stats_accueil {
-    display: grid;   /* Active CSS Grid */
+    display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));  /* Colonnes automatiques de min 250px */
-    gap: 24px;     /* Espacement entre les éléments de la grille */
+    gap: 24px;                                                   /* Espacement entre les éléments de la grille */
     margin-bottom: 48px;
-    justify-items: center;  /* Centre les éléments dans leur cellule */
+    justify-items: center;                                     /* Centre les éléments dans leur cellule */
 }
 
-/* .stats_accueil: carte individuelle de statistique */
+/* Cadre artistes affichés */
 .stats_accueil {
     background: var(--fond_cartes);
     padding: 32px;
@@ -206,11 +181,9 @@ body {
 }
 
 .stats_accueil:hover {
-    /* small translate removed */
     box-shadow: var(--ombre_survol);
 }
 
-/* .txt_stats_accueil: label; .stats_value: valeur mise en avant */
 .txt_stats_accueil {
     margin: 0;
     font-weight: 600;
@@ -218,19 +191,19 @@ body {
     font-size: 15.2px;
 }
 
-.stats_value {
+/* Nombre d'artistes affichés */
+.stats_valeur {
     color: var(--color1);
     font-size: 32px;
     margin: 8px 0;
 }
 
-/* .filters_form: formulaire de filtres */
-.filters_form {
+.taille_cadre_filtre {
     width: 100%;
 }
 
-/* .filters_panel: bloc contenant les contrôles de filtrage */
-.filters_panel {
+/* Cadre des filtres */
+.cadre_filtres {
     background: var(--fond_cartes);
     padding: 24px;
     border-radius: var(--coins);
@@ -238,52 +211,22 @@ body {
     box-shadow: var(--ombre);
 }
 
-/* .filters_title: titre du panneau de filtres */
-.filters_title {
+.titre_filtres {
     margin: 0 0 16px 0;
     color: var(--txt_sombre);
     font-size: 17.6px;
 }
 
-/* .filters_quick: puces de filtre rapide */
-.filters_quick {
-    display: flex;
-    gap: 12.8px;
-    margin-bottom: 24px;
-    flex-wrap: wrap;
-}
-
-/* Puces de filtre rapide */
-/* .filter_chip: petite puce style pilule */
-.filter_chip {
-    padding: 8px 16px;
-    background: #edf2f7;
-    color: var(--txt_sombre);
-    border: 2px solid transparent;
-    border-radius: 20px;         /* Très arrondi pour effet "pilule" */
-    font-size: 13.6px;
-    cursor: pointer;
-    transition: var(--transition);
-    font-weight: 600;
-}
-
-.filter_chip:hover {
-    background: linear-gradient(135deg, var(--color1), var(--color2));
-    color: white;
-    /* subtle box-shadow removed */
-}
-
-/* Grille des champs de filtres */
-/* .filters_grid: grille d'inputs de filtre */
-.filters_grid {
+/* Disposition des filtres */
+.dispo_filtres {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));  /* Colonnes adaptatives */
     gap: 16px;
     margin-bottom: 16px;
 }
 
-/* .filters_label: étiquette d'un champ de filtre */
-.filters_label {
+/* Titres des filtres */
+.label_filtres {
     display: block;
     margin-bottom: 4.8px;
     color: var(--txt_clair);
@@ -291,8 +234,8 @@ body {
     font-weight: 600;
 }
 
-/* .filters_input: champ input/selection pour filtrer */
-.filters_input {
+/* Inputs des filtres */
+.inputs_filtres {
     width: 100%;
     padding: 11.2px;
     border: 2px solid var(--border_color);
@@ -301,29 +244,26 @@ body {
     transition: var(--transition);
 }
 
-.filters_input:focus {
+.inputs_filtres:focus {
     outline: none;
     border-color: var(--color1);
-    /* focus halo removed */
 }
 
-/* Conteneur pour 2 inputs côte à côte (Min/Max) */
-/* .filters_range: conteneur pour deux inputs côte à côte */
-.filters_range {
+/* Division d'un input en deux (min/max) */
+.filtres_min_max {
     display: flex;
     gap: 8px;
 }
 
-/* Conteneur des boutons d'action */
-/* .filters_actions: zone des boutons Appliquer / Réinitialiser */
-.filters_actions {
+/* Dispositions boutons filtres */
+.boutons_filtres {
     display: flex;
     gap: 16px;
     justify-content: flex-end;  /* Aligne à droite */
 }
 
-/* .btn_filter_reset: bouton réinitialiser */
-.btn_filter_reset {
+/* Bouton reset les filtres */
+.bouton_reset {
     padding: 11.2px 24px;
     background: #f7fafc;
     color: var(--txt_clair);
@@ -334,13 +274,12 @@ body {
     transition: var(--transition);
 }
 
-.btn_filter_reset:hover {
+.bouton_reset:hover {
     background: #e2e8f0;
-    /* subtle border-color change removed */
 }
 
-/* .btn_filter_apply: bouton appliquer les filtres */
-.btn_filter_apply {
+/* Bouton appliquer les filtres */
+.bouton_appliquer {
     padding: 11.2px 32px;
     background: linear-gradient(135deg, var(--color1), var(--color2));
     color: white;
@@ -352,21 +291,15 @@ body {
     box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
 }
 
-.btn_filter_apply:hover {
-    box-shadow: 0 6px 20px rgba(29, 78, 216, 0.4);
-    /* small translate removed */
-}
-
-/* .cadre_suggestions_accueil: grille de cartes d'artistes */
-.cadre_suggestions_accueil {
+/* Disposition des cadres artistes */
+.dispo_artistes_accueil {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 32px;
     margin-top: 32px;
 }
 
-/* Carte d'artiste */
-/* .suggestions: carte d'artiste (image de fond + nom) */
+/* Cadres artistes accueil */
 .suggestions {
     background: var(--fond_cartes);
     border-radius: var(--coins);
@@ -378,14 +311,14 @@ body {
     height: 350px;
     width: 100%;
     
-    /* Image de fond */
-    background-size: cover;        /* Image couvre toute la carte */
-    background-position: center;   /* Image centrée */
+    /* Image artiste */
+    background-size: cover;          /* Image couvre toute la carte */
+    background-position: center;    /* Image centrée */
     background-repeat: no-repeat;  /* Pas de répétition */
     
-    /* Flexbox pour positionner le nom en bas */
+    /* Disposition infos artiste */
     display: flex;
-    flex-direction: column;        /* Disposition verticale */
+    flex-direction: column;         /* Disposition verticale */
     justify-content: flex-end;     /* Contenu en bas */
     
     /* Animation d'apparition */
@@ -393,18 +326,16 @@ body {
 }
 
 .suggestions:hover {
-    /* small translate removed */
     box-shadow: var(--ombre_survol);
     border-color: var(--color1);
 }
 
-/* .artist_card: wrapper cliquable pour une carte d'artiste */
-.artist_card {
+/* Possibilité de cliquer sur les cartes artistes */
+.carte_artiste {
     cursor: pointer;
 }
 
-/* Nom de l'artiste (en bas de la carte) */
-/* .txt_noms_suggestions: zone du nom sur la carte (en bas) */
+/* Nom de l'artiste en bas de la carte */
 .txt_noms_suggestions {
     padding: 19.2px;
     background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.7));
@@ -423,7 +354,7 @@ body {
 }
 
 /* Message pas d'artistes dispo */
-.grid_message {
+.message_pas_artistes {
     grid-column: 1 / -1;
     text-align: center;
     color: white;
@@ -472,23 +403,23 @@ body {
 }
 
 /* Mise en forme des listes bandeau */
-.members_title {
+.titre_membres {
     margin-top: 24px;
     font-weight: 700;
 }
 
-.member_item {
+.item_membres {
     margin: 6.4px 0;          /* marge haut/bas et marge gauche/droite */
     text-align: center;
 }
 
-.section_heading {
+.titre_concerts {
     text-align: center;
     margin-bottom: 16px;
 }
 
 /* Cadre regroupement concerts */
-.cadre_artiste_details {
+.cadre_concerts_details {
     background: linear-gradient(135deg, var(--color1), var(--color2));
     color: white;
     padding: 48px 32px;

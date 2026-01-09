@@ -9,6 +9,21 @@ import (
 	"groupie-tracker/internal/api"
 )
 
+type ConcertData struct {
+	Location string `json:"location"`
+	Date     string `json:"date"`
+}
+
+type ArtistPageData struct {
+	ID           int
+	Image        string
+	Name         string
+	Members      []string
+	CreationDate int
+	FirstAlbum   string
+	Concerts     []ConcertData
+}
+
 func ArtistePage(w http.ResponseWriter, r *http.Request) {
 	idStr := r.URL.Query().Get("id")
 	if idStr == "" {
@@ -29,6 +44,30 @@ func ArtistePage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Récupérer les concerts
+	relations, err := api.FetchRelationByID(id)
+	var concerts []ConcertData
+	if err == nil {
+		for location, dates := range relations.DatesLocations {
+			for _, date := range dates {
+				concerts = append(concerts, ConcertData{
+					Location: location,
+					Date:     date,
+				})
+			}
+		}
+	}
+
+	data := ArtistPageData{
+		ID:           artist.ID,
+		Image:        artist.Image,
+		Name:         artist.Name,
+		Members:      artist.Members,
+		CreationDate: artist.CreationDate,
+		FirstAlbum:   artist.FirstAlbum,
+		Concerts:     concerts,
+	}
+
 	tmpl, err := template.ParseFiles("static/artiste.html")
 	if err != nil {
 		log.Printf("Erreur template: %v", err)
@@ -36,7 +75,7 @@ func ArtistePage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := tmpl.Execute(w, artist); err != nil {
+	if err := tmpl.Execute(w, data); err != nil {
 		log.Printf("Erreur execution: %v", err)
 		http.Error(w, "Erreur affichage", http.StatusInternalServerError)
 		return

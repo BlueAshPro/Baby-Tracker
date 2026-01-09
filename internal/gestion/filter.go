@@ -1,7 +1,7 @@
 package gestion
 
 import (
-	"encoding/json"
+	"html/template"
 	"log"
 	"net/http"
 	"strconv"
@@ -20,7 +20,7 @@ func FilterArtists(w http.ResponseWriter, r *http.Request) {
 	membersMax := params.Get("membersMax")
 	location := strings.ToLower(strings.TrimSpace(params.Get("location")))
 
-	// Récupération de tous les artistes depuis l'API externe
+	// Récupération de tous les artistes depuis l'API ext
 	artists, err := api.FetchArtists()
 	if err != nil {
 		log.Printf("Erreur fetch: %v", err)
@@ -64,7 +64,7 @@ func FilterArtists(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	results := make([]models.Artist, 0, len(artists))
+	results := make([]interface{}, 0, len(artists))
 
 	for _, artist := range artists {
 		if hasMinYear && artist.CreationDate < minYear {
@@ -74,8 +74,16 @@ func FilterArtists(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		if albumYear != "" && !strings.Contains(artist.FirstAlbum, albumYear) {
-			continue
+		if albumYear != "" {
+			// Extraire l'année du format "DD-MM-YYYY"
+			albumParts := strings.Split(artist.FirstAlbum, "-")
+			if len(albumParts) >= 3 {
+				if !strings.Contains(albumParts[2], albumYear) {
+					continue
+				}
+			} else if !strings.Contains(artist.FirstAlbum, albumYear) {
+				continue
+			}
 		}
 
 		memberCount := len(artist.Members)
@@ -108,10 +116,20 @@ func FilterArtists(w http.ResponseWriter, r *http.Request) {
 		results = append(results, artist)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(results); err != nil {
-		log.Printf("Erreur JSON: %v", err)
-		http.Error(w, "Erreur encodage", http.StatusInternalServerError)
+	data := HomeData{
+		Artists: results,
+	}
+
+	tmpl, err := template.ParseFiles("static/accueil.html")
+	if err != nil {
+		log.Printf("Erreur template: %v", err)
+		http.Error(w, "Erreur template", http.StatusInternalServerError)
+		return
+	}
+
+	if err := tmpl.Execute(w, data); err != nil {
+		log.Printf("Erreur execution: %v", err)
+		http.Error(w, "Erreur affichage", http.StatusInternalServerError)
 		return
 	}
 

@@ -12,19 +12,6 @@ type Artist struct {
 	Relations    string   `json:"relations"`
 }
 
-type Location struct {
-	ID        int      `json:"id"`
-	Locations []string `json:"locations"`
-	Dates     string   `json:"dates"`
-}
-
-type DateLocation struct {
-	Index []struct {
-		ID        int      `json:"id"`
-		Locations []string `json:"locations"`
-	} `json:"index"`
-}
-
 type Relation struct {
 	ID             int                 `json:"id"`
 	DatesLocations map[string][]string `json:"datesLocations"`

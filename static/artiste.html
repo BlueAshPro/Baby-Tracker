@@ -8,13 +8,11 @@
     </head>
     <body>
         <div class="header_accueil">
-            <div class="cadre_header_accueil">
-                <p class="txt_header_accueil">Groupie Tracker</p>
-            </div>
+            <img src="logo.png" alt="Logo_babytrack" class="logo_header">
             <div class="cadre_header_accueil">
                 <p class="txt_header_accueil">BabyTrack</p>
             </div>
-            <button class="btn_navbar" onclick="window.location.href='/'">
+            <button class="btn_retour" onclick="window.location.href='/'">
                 <p>← Retour</p>
             </button>
         </div>
@@ -33,13 +31,13 @@
                 <h2>{{.Name}}</h2>
                 <p>Créé en <strong>{{.CreationDate}}</strong></p>
                 <p>Premier album: <strong>{{.FirstAlbum}}</strong></p>
-                <p class="members_title"><strong>Membres ({{len .Members}})</strong></p>
+                <p class="titre_membres"><strong>Membres ({{len .Members}})</strong></p>
                 {{range .Members}}
-                    <p class="member_item">• {{.}}</p>
+                    <p class="item_membres">• {{.}}</p>
                 {{end}}
             </div>
-            <div class="cadre_artiste_details">
-                <h3 class="section_heading">Concerts & Tournées</h3>
+            <div class="cadre_concerts_details">
+                <h3 class="titre_concerts">Concerts & Tournées</h3>
                 <div class="concerts_container" id="concerts-container">
                     {{range .Concerts}}
                     <div>
