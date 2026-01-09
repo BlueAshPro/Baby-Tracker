@@ -3,234 +3,77 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="/css/styles.css" rel="stylesheet" />
+        <link rel="stylesheet" href="/css/styles.css" />
         <title>BabyTrack - Accueil</title>
     </head>
     <body>
         <div class="header_accueil">
-            <div class="cadre_logo_accueil">
+            <div class="cadre_header_accueil">
                 <p class="txt_header_accueil">Groupie Tracker</p>
             </div>
-            <div class="cadre_titre_accueil">
+            <div class="cadre_header_accueil">
                 <p class="txt_header_accueil">BabyTrack</p>
             </div>
-            <input type="text" id="searchInput" class="navbar_test" placeholder="Rechercher un artiste..." autocomplete="off">
+            <form action="/api/search" method="GET" class="search_form">
+                <input type="text" name="q" class="navbar_test" placeholder="Rechercher un artiste..." autocomplete="off">
+            </form>
         </div>
-        
         <div class="bandeau_accueil">
-            <div class="option" onclick="window.location.href='/'" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));">
+            <div class="option option_active" onclick="window.location.href='/'">
                 <p class="txt_option">Accueil</p>
             </div>
             <div class="option" onclick="window.location.href='/'">
                 <p class="txt_option">Tous les Artistes</p>
             </div>
         </div>
-        
         <div class="container">
             <div class="cadre_stats_accueil">
                 <div class="stats_accueil">
                     <p class="txt_stats_accueil">Artistes affichés</p>
-                    <h3 id="totalArtists" style="color: var(--primary-color); font-size: 2rem; margin: 0.5rem 0;">--</h3>
+                    <h3 id="totalArtists" class="stats_value">{{len .Artists}}</h3>
                 </div>
             </div>
-
             <p class="txt_suggestions_accueil">Découvrez les artistes</p>
-            <div style="background: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
-                <h4 style="margin: 0 0 1rem 0; color: #2d3748; font-size: 1.1rem;">Filtres rapides</h4>
-                
-                <!-- Filtres prédéfinis -->
-                <div style="display: flex; gap: 0.8rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
-                    <button onclick="applyQuickFilter('solo')" style="padding: 0.5rem 1rem; background: #edf2f7; color: #2d3748; border: 2px solid transparent; border-radius: 20px; font-size: 0.85rem; cursor: pointer; transition: all 0.3s; font-weight: 600;" onmouseover="this.style.background='var(--primary-color)'; this.style.color='white'" onmouseout="this.style.background='#edf2f7'; this.style.color='#2d3748'">Artistes solo</button>
-                    <button onclick="applyQuickFilter('group')" style="padding: 0.5rem 1rem; background: #edf2f7; color: #2d3748; border: 2px solid transparent; border-radius: 20px; font-size: 0.85rem; cursor: pointer; transition: all 0.3s; font-weight: 600;" onmouseover="this.style.background='var(--primary-color)'; this.style.color='white'" onmouseout="this.style.background='#edf2f7'; this.style.color='#2d3748'">Groupes</button>
-                    <button onclick="applyQuickFilter('recent')" style="padding: 0.5rem 1rem; background: #edf2f7; color: #2d3748; border: 2px solid transparent; border-radius: 20px; font-size: 0.85rem; cursor: pointer; transition: all 0.3s; font-weight: 600;" onmouseover="this.style.background='var(--primary-color)'; this.style.color='white'" onmouseout="this.style.background='#edf2f7'; this.style.color='#2d3748'">Récents (2000+)</button>
-                    <button onclick="applyQuickFilter('classic')" style="padding: 0.5rem 1rem; background: #edf2f7; color: #2d3748; border: 2px solid transparent; border-radius: 20px; font-size: 0.85rem; cursor: pointer; transition: all 0.3s; font-weight: 600;" onmouseover="this.style.background='var(--primary-color)'; this.style.color='white'" onmouseout="this.style.background='#edf2f7'; this.style.color='#2d3748'">Classiques (avant 2000)</button>
-                </div>
-
-                <!-- Filtres personnalisés -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
-                    <div>
-                        <label style="display: block; margin-bottom: 0.3rem; color: #4a5568; font-size: 0.85rem; font-weight: 600;">Année de création</label>
-                        <input type="number" id="creationDateMin" placeholder="Ex: 1990" style="width: 100%; padding: 0.7rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.9rem;">
-                    </div>
-                    <div>
-                        <label style="display: block; margin-bottom: 0.3rem; color: #4a5568; font-size: 0.85rem; font-weight: 600;">Nombre de membres</label>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <input type="number" id="membersMin" placeholder="Min" style="width: 50%; padding: 0.7rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.9rem;">
-                            <input type="number" id="membersMax" placeholder="Max" style="width: 50%; padding: 0.7rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.9rem;">
+            <form action="/api/filter" method="GET" class="filters_form">
+                <div class="filters_panel">
+                    <h4 class="filters_title">Filtres rapides</h4>
+                    
+                    <div class="filters_grid">
+                        <div>
+                            <label class="filters_label">Année de création</label>
+                            <input type="number" name="creationDateMin" class="filters_input" placeholder="Ex: 1990">
+                        </div>
+                        <div>
+                            <label class="filters_label">Année 1er album</label>
+                            <input type="number" name="firstAlbumYear" class="filters_input" placeholder="Ex: 1995">
+                        </div>
+                        <div>
+                            <label class="filters_label">Nombre de membres</label>
+                            <div class="filters_range">
+                                <input type="number" name="membersMin" class="filters_input" placeholder="Min">
+                                <input type="number" name="membersMax" class="filters_input" placeholder="Max">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="filters_label">Ville de concert</label>
+                            <input type="text" name="location" class="filters_input" placeholder="Ex: Paris, London...">
                         </div>
                     </div>
-                    <div>
-                        <label style="display: block; margin-bottom: 0.3rem; color: #4a5568; font-size: 0.85rem; font-weight: 600;">Ville de concert</label>
-                        <input type="text" id="locationFilter" placeholder="Ex: Paris, London..." style="width: 100%; padding: 0.7rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.9rem;">
+                    <div class="filters_actions">
+                        <a href="/" class="btn_filter_reset">Réinitialiser</a>
+                        <button type="submit" class="btn_filter_apply">Appliquer</button>
                     </div>
                 </div>
-                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-                    <button id="resetBtn" style="padding: 0.7rem 1.5rem; background: #f7fafc; color: #4a5568; border: 2px solid #e2e8f0; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s;">Réinitialiser</button>
-                    <button id="filterBtn" style="padding: 0.7rem 2rem; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);">Appliquer</button>
-                </div>
-            </div>
+            </form>
             <div class="cadre_suggestions_accueil" id="artistsGrid">
-                <div style="grid-column: 1 / -1; text-align: center; padding: 4rem; color: white;">
-                    <div class="spinner"></div>
-                    <p>Chargement des artistes...</p>
+                {{range .Artists}}
+                <div class="suggestions artist_card" style="background-image: url('{{.Image}}');" onclick="window.location.href='/artiste?id={{.ID}}'">
+                    <div class="txt_noms_suggestions">{{.Name}}</div>
                 </div>
+                {{else}}
+                <p class="grid_message">Aucun artiste disponible</p>
+                {{end}}
             </div>
         </div>
-
-        <!-- SCRIPT JavaScript -->
-        <script>
-            let cachedArtists = null;
-
-            async function loadArtists() {
-                try {
-                    const response = await fetch('/api/artists');
-                    const artists = await response.json();
-                    cachedArtists = artists;
-                    
-                    if (!artists || artists.length === 0) {
-                        document.getElementById('artistsGrid').innerHTML = '<p style="color: white; text-align: center; grid-column: 1 / -1;">Aucun artiste trouvé</p>';
-                        return;
-                    }
-
-                    document.getElementById('totalArtists').textContent = artists.length;
-
-                    displayArtists(artists);
-
-                    console.log(artists.length + ' artistes chargés');
-                } catch (error) {
-                    console.error('Erreur:', error);
-                    document.getElementById('artistsGrid').innerHTML = '<p style="color: white; text-align: center; grid-column: 1 / -1;">Erreur de chargement</p>';
-                }
-            }
-
-            document.getElementById('filterBtn').addEventListener('click', async () => {
-                const creationDateMin = document.getElementById('creationDateMin').value;
-                const membersMin = document.getElementById('membersMin').value;
-                const membersMax = document.getElementById('membersMax').value;
-                const location = document.getElementById('locationFilter').value.trim();
-
-                let url = '/api/filter?';
-                const params = [];
-                
-                if (creationDateMin) params.push(`creationDateMin=${creationDateMin}`);
-                if (membersMin) params.push(`membersMin=${membersMin}`);
-                if (membersMax) params.push(`membersMax=${membersMax}`);
-                if (location) params.push(`location=${encodeURIComponent(location)}`);
-
-                if (params.length === 0) {
-                    alert('Veuillez entrer au moins un critère de filtre');
-                    return;
-                }
-
-                url += params.join('&');
-
-                try {
-                    const response = await fetch(url);
-                    const results = await response.json();
-                    displayArtists(results);
-                    console.log(results.length + ' résultat(s)');
-                } catch (error) {
-                    console.error('Erreur filtrage:', error);
-                    alert('Erreur lors du filtrage');
-                }
-            });
-
-            document.getElementById('resetBtn').addEventListener('click', () => {
-                document.getElementById('creationDateMin').value = '';
-                document.getElementById('membersMin').value = '';
-                document.getElementById('membersMax').value = '';
-                document.getElementById('locationFilter').value = '';
-                document.getElementById('searchInput').value = '';
-                loadArtists();
-            });
-
-            let searchTimeout;
-            document.getElementById('searchInput').addEventListener('input', function() {
-                clearTimeout(searchTimeout);
-                const query = this.value;
-                
-                if (query.length === 0) {
-                    loadArtists();
-                    return;
-                }
-                
-                if (query.length < 2) return;
-                
-                searchTimeout = setTimeout(async () => {
-                    try {
-                        const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
-                        const results = await response.json();
-                        displayArtists(results);
-                    } catch (error) {
-                        console.error('Erreur recherche:', error);
-                    }
-                }, 300);
-            });
-
-            function displayArtists(artists) {
-                const grid = document.getElementById('artistsGrid');
-                
-                if (!artists || artists.length === 0) {
-                    grid.innerHTML = '<p style="color: white; text-align: center; grid-column: 1 / -1; padding: 2rem;">Aucun artiste trouvé</p>';
-                    return;
-                }
-
-                document.getElementById('totalArtists').textContent = artists.length;
-                
-                grid.innerHTML = '';
-                artists.forEach(artist => {
-                    const card = document.createElement('div');
-                    card.className = 'suggestions';
-                    card.style.backgroundImage = `url('${artist.image}')`;
-                    card.onclick = () => window.location.href = `/artiste?id=${artist.id}`;
-                    
-                    const name = document.createElement('div');
-                    name.className = 'txt_noms_suggestions';
-                    name.textContent = artist.name;
-                    
-                    card.appendChild(name);
-                    grid.appendChild(card);
-                });
-            }
-
-            function applyQuickFilter(type) {
-                document.getElementById('creationDateMin').value = '';
-                document.getElementById('membersMin').value = '';
-                document.getElementById('membersMax').value = '';
-                document.getElementById('locationFilter').value = '';
-
-                let url = '/api/filter?';
-                const params = [];
-
-                switch(type) {
-                    case 'solo':
-                        document.getElementById('membersMin').value = '1';
-                        document.getElementById('membersMax').value = '1';
-                        params.push('membersMin=1', 'membersMax=1');
-                        break;
-                    case 'group':
-                        document.getElementById('membersMin').value = '2';
-                        params.push('membersMin=2');
-                        break;
-                    case 'recent':
-                        document.getElementById('creationDateMin').value = '2000';
-                        params.push('creationDateMin=2000');
-                        break;
-                    case 'classic':
-                        params.push('creationDateMax=1999');
-                        break;
-                }
-                
-                if (params.length > 0) {
-                    url += params.join('&');
-                    fetch(url)
-                        .then(response => response.json())
-                        .then(results => displayArtists(results))
-                        .catch(error => console.error('Erreur:', error));
-                }
-            }
-
-            window.addEventListener('DOMContentLoaded', loadArtists);
-        </script>
     </body>
 </html>

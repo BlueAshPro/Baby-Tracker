@@ -3,22 +3,21 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="/css/styles.css" rel="stylesheet" />
+        <link rel="stylesheet" href="/css/styles.css" />
         <title>{{.Name}} - BabyTrack</title>
     </head>
     <body>
         <div class="header_accueil">
-            <div class="cadre_logo_accueil">
+            <div class="cadre_header_accueil">
                 <p class="txt_header_accueil">Groupie Tracker</p>
             </div>
-            <div class="cadre_titre_accueil">
+            <div class="cadre_header_accueil">
                 <p class="txt_header_accueil">BabyTrack</p>
             </div>
             <button class="btn_navbar" onclick="window.location.href='/'">
                 <p>← Retour</p>
             </button>
         </div>
-        
         <div class="bandeau_accueil">
             <div class="option" onclick="window.location.href='/'">
                 <p class="txt_option">Accueil</p>
@@ -27,67 +26,31 @@
                 <p class="txt_option">Artistes</p>
             </div>
         </div>
-
         <div class="container">
             <div class="bandeau_left">
-                <div class="cadre_photo_artiste" style="background-image: url('{{.Image}}'); background-size: cover; background-position: center;">
+                <div class="cadre_photo_artiste" style="background-image: url('{{.Image}}');">
                 </div>
                 <h2>{{.Name}}</h2>
                 <p>Créé en <strong>{{.CreationDate}}</strong></p>
                 <p>Premier album: <strong>{{.FirstAlbum}}</strong></p>
-                <p style="margin-top: 1.5rem;"><strong>Membres ({{len .Members}})</strong></p>
+                <p class="members_title"><strong>Membres ({{len .Members}})</strong></p>
                 {{range .Members}}
-                    <p style="margin-left: 1rem;">• {{.}}</p>
+                    <p class="member_item">• {{.}}</p>
                 {{end}}
             </div>
-
             <div class="cadre_artiste_details">
-                <h3 style="text-align: center; margin-bottom: 1rem;">Concerts & Tournées</h3>
-                
+                <h3 class="section_heading">Concerts & Tournées</h3>
                 <div class="concerts_container" id="concerts-container">
-                    <p style="text-align: center; grid-column: 1 / -1;">Chargement des concerts...</p>
+                    {{range .Concerts}}
+                    <div>
+                        <p>{{.Location}}</p>
+                        <p>{{.Date}}</p>
+                    </div>
+                    {{else}}
+                    <p class="grid_message grid_message--compact">Aucun concert disponible</p>
+                    {{end}}
                 </div>
             </div>
         </div>
-
-        <script>
-            document.addEventListener('DOMContentLoaded', async function() {
-                const artistId = new URLSearchParams(window.location.search).get('id');
-                
-                if (!artistId) {
-                    console.error('ID artiste manquant');
-                    return;
-                }
-
-                try {
-                    const response = await fetch(`/api/artist/${artistId}/concerts`);
-                    if (!response.ok) throw new Error('Erreur API');
-                    
-                    const concerts = await response.json();
-                    const container = document.getElementById('concerts-container');
-                    
-                    if (!concerts || concerts.length === 0) {
-                        container.innerHTML = '<p style="grid-column: 1 / -1; text-align: center;">Aucun concert disponible</p>';
-                        return;
-                    }
-
-                    let html = '';
-                    concerts.forEach((concert, index) => {
-                        html += `
-                            <div>
-                                <p>${concert.location}</p>
-                                <p>${concert.date}</p>
-                            </div>
-                        `;
-                    });
-                    
-                    container.innerHTML = html;
-                    console.log(concerts.length + ' concerts chargés');
-                } catch (error) {
-                    console.error('Erreur chargement concerts:', error);
-                    document.getElementById('concerts-container').innerHTML = '<p style="grid-column: 1 / -1; text-align: center;">Erreur lors du chargement des concerts</p>';
-                }
-            });
-        </script>
     </body>
 </html>
