@@ -55,43 +55,6 @@ Le projet repose sur une **architecture serveur simple**
 └───────────────────────────────────────────────────────────────┘
 ```
 
----
-
-## Principe de Fonctionnement
-
-### 1. Page d’accueil `/`
-
-- Sert une page HTML statique  
-- Chargement initial de tous les artistes via l’API interne  
-- Affichage sous forme de cartes  
-
-### 2. API interne `/api/artists`
-
-- Point d’entrée JSON  
-- Sert de passerelle entre le frontend et l’API externe  
-- Centralise les appels réseau  
-
-### 3. Recherche `/api/search`
-
-- Recherche textuelle côté serveur  
-- Insensible à la casse  
-- Optimisée pour limiter les appels réseau  
-
-### 4. Filtres `/api/filter`
-
-Filtres combinables :
-- date de création  
-- nombre de membres  
-- localisation  
-
-### 5. Page artiste `/artiste?id=X`
-
-- Page dynamique générée côté serveur  
-- Données spécifiques à un artiste  
-- Intégration des concerts et localisations  
-
----
-
 ## Structure du Projet
 
 ```
